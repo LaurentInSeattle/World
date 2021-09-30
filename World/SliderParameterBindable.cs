@@ -19,10 +19,7 @@
 
         private Parameter parameter;
 
-        public SliderParameterBindable(Parameter parameter)
-        {
-            this.parameter = parameter;
-        }
+        public SliderParameterBindable(Parameter parameter) => this.parameter = parameter;
 
         public override void OnDataBinding()
         {
