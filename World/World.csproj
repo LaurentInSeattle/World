@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Lyt.World</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="JavaScript\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ScottPlot.WPF" Version="4.1.17" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoreMvvm\CoreMvvm.csproj" />
+  </ItemGroup>
+
+</Project>
