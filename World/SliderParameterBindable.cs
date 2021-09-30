@@ -17,7 +17,7 @@
         private const string floatFormat = "{0:F2}";
         private const string intFormat = "{0:D}";
 
-        private Parameter parameter;
+        private readonly Parameter parameter;
 
         public SliderParameterBindable(Parameter parameter) => this.parameter = parameter;
 
