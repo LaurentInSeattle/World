@@ -1,4 +1,4 @@
-﻿namespace Lyt.World
+﻿namespace Lyt.World.UserInterface.Controls
 {
     using System.Windows.Controls;
 

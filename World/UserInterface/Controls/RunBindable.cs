@@ -1,5 +1,4 @@
-﻿
-namespace Lyt.World
+﻿namespace Lyt.World.UserInterface.Controls
 {
     using Lyt.CoreMvvm;
     using Lyt.CoreMvvm.Extensions;
@@ -14,15 +13,15 @@ namespace Lyt.World
 
     public sealed class RunBindable : DialogBindable<RunControl>
     {
-        private Model.Model model; 
+        private WorldModel model; 
 
-        public RunBindable(Model.Model model )
+        public RunBindable(WorldModel model )
         {
             this.model = model;
             this.CancelCommand = new Command(this.ExecuteCancelCommand);
             this.RunCommand = new Command(this.ExecuteRunCommand);
             var sliders = new List<SliderParameterBindable>();
-            foreach (var parameter in Parameters.Instance.All.Values)
+            foreach (var parameter in this.model.Parameters.All.Values)
             {
                 sliders.Add(new SliderParameterBindable(parameter)); 
             }
@@ -32,13 +31,13 @@ namespace Lyt.World
 
         private void ExecuteCancelCommand(object _)
         {
-            Parameters.Instance.CancelEdits();
+            this.model.Parameters.CancelEdits();
             this.Dismiss(); 
         }
 
         private void ExecuteRunCommand(object _)
         {
-            Parameters.Instance.CommitEdits(); 
+            this.model.Parameters.CommitEdits(); 
             this.Validate();
         }
 

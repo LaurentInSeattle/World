@@ -1,7 +1,9 @@
 ﻿namespace Lyt.World.Model
 {
+    using Lyt.World.Engine;
+
     // Model Variables: Creates the Capital Sector - Equations #49 to #83
-    public sealed partial class Model
+    public sealed partial class WorldModel
     {
         private Level industrialCapital;
         private Level serviceCapital;
@@ -86,7 +88,7 @@
             {
                 UpdateFunction = delegate ()
                 {
-                    return Clip(industrialCapitalOutputRatioAfter, industrialCapitalOutputRatioBefore, this.Time, Model.PolicyYear);
+                    return Clip(industrialCapitalOutputRatioAfter, industrialCapitalOutputRatioBefore, this.Time, WorldModel.PolicyYear);
                 }
             };
 
@@ -114,7 +116,7 @@
                 {
                     return
                         Clip(averageLifetimeOfIndustrialCapitalAfter, averageLifetimeOfIndustrialCapitalBefore,
-                        this.Time, Model.PolicyYear);
+                        this.Time, WorldModel.PolicyYear);
                 }
             };
 
@@ -162,7 +164,7 @@
                             Clip(
                                 fractionOfIndustrialOutputAllocatedToConsumptionConstantAfter,
                                 fractionOfIndustrialOutputAllocatedToConsumptionConstantBefore,
-                                this.Time, Model.PolicyYear);
+                                this.Time, WorldModel.PolicyYear);
                     }
                 };
 
@@ -196,7 +198,7 @@
                     return
                         Clip(
                             indicatedServiceOutputPerCapitaAfter.K, indicatedServiceOutputPerCapitaBefore.K,
-                            this.Time, Model.PolicyYear);
+                            this.Time, WorldModel.PolicyYear);
                 }
             };
 
@@ -227,7 +229,7 @@
                             Clip(
                                 fractionOfIndustrialOutputAllocatedToServicesAfter.K,
                                 fractionOfIndustrialOutputAllocatedToServicesBefore.K,
-                                this.Time, Model.PolicyYear);
+                                this.Time, WorldModel.PolicyYear);
                     }
                 };
 
@@ -275,7 +277,7 @@
                     return
                         Clip(
                             averageLifetimeOfServiceCapitalAfter, averageLifetimeOfServiceCapitalBefore,
-                            this.Time, Model.PolicyYear);
+                            this.Time, WorldModel.PolicyYear);
                 }
             };
 
@@ -299,7 +301,7 @@
             {
                 UpdateFunction = delegate ()
                 {
-                    return Clip(serviceCapitalOutputRatioAfter, serviceCapitalOutputRatioBefore, this.Time, Model.PolicyYear);
+                    return Clip(serviceCapitalOutputRatioAfter, serviceCapitalOutputRatioBefore, this.Time, WorldModel.PolicyYear);
                 }
             };
 

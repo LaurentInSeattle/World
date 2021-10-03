@@ -50,10 +50,16 @@
         }
     }
 
-    public class Bindable<TControl> : Bindable where TControl : FrameworkElement
+    public class Bindable<TControl> : Bindable where TControl : FrameworkElement, new () 
     {
         public Bindable(TControl frameworkElement = null) => this.Bind(frameworkElement);
 
         public TControl View => this.frameworkElement as TControl;
+
+        public static Bindable<TControl> Create()
+        {
+            var control = new TControl();
+            return new Bindable<TControl>(control);
+        }
     }
 }

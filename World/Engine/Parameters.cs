@@ -1,4 +1,4 @@
-﻿namespace Lyt.World.Model
+﻿namespace Lyt.World.Engine
 {
     using Lyt.CoreMvvm;
     using Lyt.CoreMvvm.Extensions;
@@ -7,22 +7,12 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public sealed class Parameters : Singleton<Parameters>
+    public sealed class Parameters 
     {
         Dictionary<string, Parameter> parameters;
 
-        public void Create()
-        {
-            var parameterList = new List<Parameter>()
-            {
-                new Parameter("Simulation Duration", 220, 180, 420, 20, Widget.Slider, null, Format.Integer),
-                new Parameter("Delta Time", 1.0, 0.2, 1.0, 0.1),
-                new Parameter("Resources Multiplier", 1.0, 0.5, 2.5, 0.1),
-                new Parameter("Output Consumed", 0.43, 0.37, 0.47, 0.01),
-            };
-
-            this.parameters = parameterList.ToDictionary(parameter => parameter.Name, parameter => parameter);
-        }
+        public Parameters(IEnumerable<Parameter> parameters) => 
+            this.parameters = parameters.ToDictionary(parameter => parameter.Name, parameter => parameter);
 
         public Dictionary<string, Parameter> All => this.parameters; 
 

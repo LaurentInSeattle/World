@@ -1,4 +1,4 @@
-﻿namespace Lyt.World.Model
+﻿namespace Lyt.World.Engine
 {
     public sealed class Smooth : Auxiliary
     {
@@ -11,7 +11,7 @@
         private readonly string inputEquationName;
         private Equation input;
 
-        public Smooth(Model model, string name, int number, string units, double delay, string inputEquationName, double initialValue) 
+        public Smooth(Simulator model, string name, int number, string units, double delay, string inputEquationName, double initialValue) 
             : base(model, name, number, units)
         {
             this.firstCall = true;
@@ -25,7 +25,7 @@
         public override void Reset()
         {
             this.firstCall = true;
-            this.input = this.Model.EquationFromName(this.inputEquationName);
+            this.input = this.Simulator.EquationFromName(this.inputEquationName);
             base.Reset();
         }
 
@@ -53,7 +53,7 @@
             }
             else
             {
-                this.K = this.J + this.Model.DeltaTime * (this.input.J - this.J) / this.delay;
+                this.K = this.J + this.Simulator.DeltaTime * (this.input.J - this.J) / this.delay;
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Lyt.World.Model
+﻿namespace Lyt.World.Engine
 {
     public enum Widget
     {

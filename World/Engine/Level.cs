@@ -1,4 +1,4 @@
-﻿namespace Lyt.World.Model
+﻿namespace Lyt.World.Engine
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@
     {
         private double initialValue; 
 
-        public Level(Model model, string name, int number, string units, double initialValue) : base (model, name, number, units)
+        public Level(Simulator model, string name, int number, string units, double initialValue) : base (model, name, number, units)
         {
             this.initialValue = initialValue;
             model.OnNewLevel(this);

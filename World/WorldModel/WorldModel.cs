@@ -1,13 +1,21 @@
-﻿namespace Lyt.World
+﻿namespace Lyt.World.Model
 {
     using Lyt.CoreMvvm;
-    using Lyt.World.UserInterface;
+    using Lyt.CoreMvvm.Extensions;
+    using Lyt.World.Engine;
 
-    using System.Windows;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+
+    //  Limits to Growth: This is a re-implementation in C# of World3, the social-economic-environmental model created by
+    //  Dennis and Donella Meadows and others circa 1970. The results of the modeling exercise were published in The Limits to Growth
+    //  in 1972, and the model itself was more fully documented in Dynamics of Growth in a Finite World in 1974. 
 
     #region MIT License and more
 
-    /* Original Work by Brian Hayes - under MIT Licence 
+    /* Original Work by Brian Hayes - under MIT Licence - Can be found in the JavaScript project folder
       
      
         MIT License
@@ -77,20 +85,46 @@
        SOFTWARE.
     */
 
-    /* My comments, circa 2021
-        This code tries to bring to a larger population of software 'people' the scope of this work done now more than 50 years ago.
+    /* Laurent's comments, circa 2021
+        This project tries to bring to a larger population of software 'people' the scope of this work done now more than 50 years ago.
         Sadly: It is spot on.
 
      */
     #endregion MIT License 
 
-    /// <summary> /// Interaction logic for MainWindow.xaml /// </summary>
-    public partial class MainWindow : Window
+    public sealed partial class WorldModel : Simulator
     {
-        public MainWindow()
+        private Parameter[] parameters = new Parameter[]
         {
-            this.InitializeComponent();
-            this.Loaded += (e, a) => { this.Content = Bindable<SimulationControl>.Create().View; };
-        } 
+            new Parameter("Simulation Duration", 220, 180, 420, 20, Widget.Slider, null, Format.Integer),
+            new Parameter("Delta Time", 1.0, 0.2, 1.0, 0.1),
+            new Parameter("Resources Multiplier", 1.0, 0.5, 2.5, 0.1),
+            new Parameter("Output Consumed", 0.43, 0.37, 0.47, 0.01),
+        };
+
+        public WorldModel() : base()
+        {
+            this.Parameters = new Parameters(parameters);
+            this.CreatePopulationSector();
+            this.CreateCapitalSector();
+            this.CreateAgriculturalSector();
+            this.CreateOtherSectors();
+            this.Parameters.ToDefaults();
+            this.AdjustForPersistenPollutionAppearanceRate();
+            base.FinalizeConstruction(this.auxSequence, this.CustomUpdate);
+        }
+
+        public void Start() => base.Start(this.Parameters.Get("Delta Time"));
+
+        public void Parametrize()
+        {
+            this.SetInitialResources(this.Parameters.Get("Resources Multiplier"));
+            this.SetOutputConsumed(this.Parameters.Get("Output Consumed"));
+        }
+
+        private void CustomUpdate() => this.persistenPollutionAppearanceRate.Update();
+
+        private void AdjustForPersistenPollutionAppearanceRate() =>
+            this.Auxiliaries.Remove("persistenPollutionAppearanceRate");
     }
 }
