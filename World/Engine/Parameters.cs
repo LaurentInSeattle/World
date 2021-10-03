@@ -30,13 +30,10 @@
             }
         }
 
-        public void ToDefaults()
-            => this.parameters.Values.ForEach<Parameter>((parameter) => parameter.Default());
+        public void ToDefaults() => this.parameters.Values.ForEach<Parameter>((parameter) => parameter.Default());
 
-        public void CommitEdits()
-            => this.parameters.Values.ForEach<Parameter>((parameter) => parameter.CommitEdits());
+        public void CommitEdits() => this.parameters.Values.ForEach<Parameter>((parameter) => parameter.CommitEdits());
 
-        public void CancelEdits()
-            => this.parameters.Values.ForEach<Parameter>((parameter) => parameter.CancelEdits());
+        public void CancelEdits() => this.parameters.Values.ForEach<Parameter>((parameter) => parameter.CancelEdits());
     }
 }

@@ -105,11 +105,11 @@
         public WorldModel() : base()
         {
             this.Parameters = new Parameters(parameters);
+            this.Parameters.ToDefaults();
             this.CreatePopulationSector();
             this.CreateCapitalSector();
             this.CreateAgriculturalSector();
             this.CreateOtherSectors();
-            this.Parameters.ToDefaults();
             this.AdjustForPersistenPollutionAppearanceRate();
             base.FinalizeConstruction(this.auxSequence, this.CustomUpdate);
         }

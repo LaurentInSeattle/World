@@ -39,6 +39,7 @@ namespace Lyt.World.UserInterface
         private DispatcherTimer timer;
         private bool stopRequested;
         private bool isRunning;
+        private bool runFast;
         private WorldModel model;
 
 
@@ -165,7 +166,7 @@ namespace Lyt.World.UserInterface
             this.UpdateYear();
         }
 
-        private void OnTick(object sender, RoutedEventArgs e)
+        private void OnTick()
         {
             if (this.model == null)
             {
@@ -173,9 +174,20 @@ namespace Lyt.World.UserInterface
             }
 
             this.model.Tick();
-            this.UpdateDebugLog();
-            this.UpdateTrackingLog();
-            this.UpdatePlots();
+            if (!this.runFast)
+            {
+                this.UpdateDebugLog();
+                this.UpdateTrackingLog();
+                this.UpdatePlots();
+            }
+            else
+            {
+                if ( ((int) this.model.Time) % 20 == 0)
+                {
+                    this.UpdatePlots();
+                }
+            }
+
             this.UpdateYear();
         }
 
@@ -199,10 +211,12 @@ namespace Lyt.World.UserInterface
                 return;
             }
 
+            this.runFast = runBindable.IsFastRun;
             this.model.Parametrize();
+            double milliseconds = this.runFast ? 10 : 200;
             this.timer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(200),
+                Interval = TimeSpan.FromMilliseconds(milliseconds),
                 IsEnabled = true,
             };
 
@@ -219,7 +233,7 @@ namespace Lyt.World.UserInterface
 
         private void TimerTick(object sender, EventArgs e)
         {
-            this.OnTick(null, null);
+            this.OnTick();
             var durationYears = this.model.Parameters.FromName("Simulation Duration");
             if (this.stopRequested || (this.model.Time > Model.WorldModel.StartYear + (int)durationYears.CurrentValue))
             {
@@ -227,6 +241,11 @@ namespace Lyt.World.UserInterface
                 this.timer.Tick -= TimerTick;
                 this.timer = null;
                 this.isRunning = false;
+
+                if (this.runFast)
+                {
+                    this.UpdatePlots();
+                }
             }
         }
 
