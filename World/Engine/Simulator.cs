@@ -176,17 +176,17 @@
                 });
         }
 
-        private void Reset() => this.EquationsList.ForEach<Equation>((e) => e.Reset());
+        private void InitializeLevels() => this.Levels.ForEach<Level>((level) => level.Initialize());
 
-        private void InitializeLevels() => this.Levels.ForEach<Level>((l) => l.Initialize());
+        private void UpdateLevels() => this.Levels.ForEach<Level>((level) => level.Update());
 
-        private void UpdateAuxiliaries() => this.OrderedAuxiliaries.ForEach<Auxiliary>((a) => a.Update());
+        private void UpdateAuxiliaries() => this.OrderedAuxiliaries.ForEach<Auxiliary>((aux) => aux.Update());
 
-        private void UpdateRates() => this.Rates.ForEach<Rate>((r) => r.Update());
+        private void UpdateRates() => this.Rates.ForEach<Rate>((rate) => rate.Update());
 
-        private void UpdateLevels() => this.Levels.ForEach<Level>((l) => l.Update());
+        private void Reset() => this.EquationsList.ForEach<Equation>((equation) => equation.Reset());
 
-        private void TickEquations() => this.EquationsList.ForEach<Equation>((e) => e.Tick());
+        private void TickEquations() => this.EquationsList.ForEach<Equation>((equation) => equation.Tick());
 
     }
 }

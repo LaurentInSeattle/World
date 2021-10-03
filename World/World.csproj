@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="ScottPlot.WPF" Version="4.1.17" />
+    <PackageReference Include="ToggleSwitch" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>

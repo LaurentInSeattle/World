@@ -18,6 +18,7 @@
         public RunBindable(WorldModel model )
         {
             this.model = model;
+            this.IsFastRun = true; 
             this.CancelCommand = new Command(this.ExecuteCancelCommand);
             this.RunCommand = new Command(this.ExecuteRunCommand);
             var sliders = new List<SliderParameterBindable>();
@@ -43,6 +44,9 @@
 
 
         #region Bound Properties
+
+        /// <summary> Gets or sets the IsFastRun property.</summary>
+        public bool IsFastRun { get => this.Get<bool>(); set => this.Set(value); }
 
         /// <summary> Gets or sets the CancelCommand property.</summary>
         public ICommand CancelCommand { get => this.Get<ICommand>(); set => this.Set(value); }

@@ -1,11 +1,13 @@
 ﻿namespace Lyt.World.Engine
 {
+    // Prefered UI widget for a parameter 
     public enum Widget
     {
         Slider,
         Switch,
     }
 
+    // Prefered UI format for a parameter 
     public enum Format
     {
         Integer,
