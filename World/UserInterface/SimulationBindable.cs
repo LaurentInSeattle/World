@@ -3,6 +3,7 @@
 namespace Lyt.World.UserInterface
 {
     using Lyt.CoreMvvm;
+    using Lyt.World.Model;
     using Lyt.World.UserInterface.Controls;
 
     using ScottPlot;
@@ -15,7 +16,7 @@ namespace Lyt.World.UserInterface
     using System.Windows.Input;
     using System.Windows.Threading;
 
-    public sealed class SimulationBindable: Bindable<SimulationControl>
+    public sealed class SimulationBindable : Bindable<SimulationControl>
     {
         #region VERBOSE and DEBUG variables 
 
@@ -38,27 +39,27 @@ namespace Lyt.World.UserInterface
         private DispatcherTimer timer;
         private bool stopRequested;
         private bool isRunning;
-        private Model.WorldModel model;
+        private WorldModel model;
 
 
-        private void OnLoad(object sender, RoutedEventArgs e)
+        public void OnLoad()
         {
-            this.model = new Model.WorldModel();
+            this.model = new WorldModel();
             this.StopCommand = new Command(this.OnStop);
             this.RunCommand = new Command(this.OnRun);
             this.CreatePlots();
-            this.OnReset(null, null);
+            this.OnReset();
         }
 
         private void CreatePlots()
         {
-            var gridContent = this.View.PlotsGrid.Children; 
+            var gridContent = this.View.PlotsGrid.Children;
 
-            void PlaceAt ( WpfPlot wpfPlot , double row, double col )
+            void PlaceAt(WpfPlot wpfPlot, int row, int col)
             {
+                Grid.SetRow(wpfPlot, row);
+                Grid.SetColumn(wpfPlot, col);
                 gridContent.Add(wpfPlot);
-                wpfPlot.SetValue(Grid.RowProperty, row);
-                wpfPlot.SetValue(Grid.ColumnProperty, col);
             }
 
             var plotTopLeft = new WpfPlot();
@@ -134,11 +135,11 @@ namespace Lyt.World.UserInterface
 
         }
 
-        private void OnReset(object sender, RoutedEventArgs e)
+        private void OnReset()
         {
             if (this.model == null)
             {
-                this.OnLoad(null, null);
+                this.OnLoad();
                 return;
             }
 
@@ -168,7 +169,7 @@ namespace Lyt.World.UserInterface
         {
             if (this.model == null)
             {
-                this.OnLoad(null, null);
+                this.OnLoad();
             }
 
             this.model.Tick();
@@ -182,11 +183,11 @@ namespace Lyt.World.UserInterface
         {
             if (this.model == null)
             {
-                this.OnLoad(null, null);
+                this.OnLoad();
             }
             else
             {
-                this.OnReset(null, null);
+                this.OnReset();
             }
 
             var runControl = new RunControl();
@@ -266,11 +267,11 @@ namespace Lyt.World.UserInterface
 
         private void UpdatePlots()
         {
-            int length = (int)((this.model.Time - Model.WorldModel.StartYear) / this.model.DeltaTime);
+            int length = (int)((this.model.Time - WorldModel.StartYear) / this.model.DeltaTime);
             double[] dataX = new double[length];
             for (int i = 0; i < length; ++i)
             {
-                dataX[i] = Model.WorldModel.StartYear + i * this.model.DeltaTime;
+                dataX[i] = WorldModel.StartYear + i * this.model.DeltaTime;
             }
 
             int locationIndex = 0;
@@ -286,7 +287,7 @@ namespace Lyt.World.UserInterface
             var pPlot = plot.Plot;
             pPlot.Clear();
             pPlot.XAxis2.Label(name);
-            int length = (int)((this.model.Time - Model.WorldModel.StartYear) / this.model.DeltaTime);
+            int length = (int)((this.model.Time - WorldModel.StartYear) / this.model.DeltaTime);
             foreach (string equationName in equations)
             {
                 var equation = this.model.EquationFromName(equationName);

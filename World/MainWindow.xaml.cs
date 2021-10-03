@@ -90,7 +90,12 @@
         public MainWindow()
         {
             this.InitializeComponent();
-            this.Loaded += (e, a) => { this.Content = Bindable<SimulationControl>.Create().View; };
+            this.Loaded += (e, a) => 
+            {
+                var simulationBindable = Binder<SimulationControl, SimulationBindable>.Create() ;
+                simulationBindable.OnLoad();
+                this.Content = simulationBindable.View; 
+            };
         } 
     }
 }
