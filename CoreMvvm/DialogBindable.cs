@@ -2,7 +2,7 @@
 {
     using System.Windows.Controls;
 
-    public class DialogBindable<TControl> : Bindable<TControl> where TControl : UserControl
+    public class DialogBindable<TControl> : Bindable<TControl> where TControl : UserControl, new ()
     {
         public Dialog<TControl> ParentDialog { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace Lyt.World.Model
 {
-    public sealed partial class Model
+    public sealed partial class WorldModel
     {
         private readonly string[] auxSequence =
         {

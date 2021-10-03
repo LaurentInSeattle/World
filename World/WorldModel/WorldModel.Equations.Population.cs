@@ -1,9 +1,11 @@
-﻿using System;
-
-namespace Lyt.World.Model
+﻿namespace Lyt.World.Model
 {
+    using Lyt.World.Engine;
+
+    using System;
+
     // Model Variables: Creates the Population Sector - Equations #1 to #48
-    public sealed partial class Model
+    public sealed partial class WorldModel
     {
         const double subsistenceFoodPerCapitaK = 230.0;  // kilograms per person-year, used in eqns 20, 127
 
@@ -350,7 +352,7 @@ namespace Lyt.World.Model
                     const double birthsPerYearPopulationEquilibriumTime = 4000.0;  // years
                     var after = deathsPerYear.K;
                     var before = totalFertility.K * population15To44.K * 0.5 / birthsPerYearReproductiveLifetime;
-                    return Model.Clip(after, before, this.Time, birthsPerYearPopulationEquilibriumTime);
+                    return WorldModel.Clip(after, before, this.Time, birthsPerYearPopulationEquilibriumTime);
                 },
             };
 

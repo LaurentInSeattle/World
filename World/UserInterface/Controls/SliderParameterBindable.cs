@@ -1,7 +1,8 @@
-﻿namespace Lyt.World
+﻿namespace Lyt.World.UserInterface.Controls
 {
     using Lyt.CoreMvvm;
     using Lyt.CoreMvvm.Extensions;
+    using Lyt.World.Engine;
     using Lyt.World.Model;
 
     using System;

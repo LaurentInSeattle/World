@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace Lyt.World.Model
+﻿namespace Lyt.World.Engine
 {
+    using System.Diagnostics;
+
     public sealed class Delay : Auxiliary
     {
         private readonly string inputEquationName;
@@ -12,7 +12,7 @@ namespace Lyt.World.Model
         private Stage beta;
         private Stage gamma;
 
-        public Delay(Model model, string name, int number, string units, double delay, string inputEquationName)
+        public Delay(Simulator model, string name, int number, string units, double delay, string inputEquationName)
             : base(model, name, number, units)
         {
             this.firstCall = true;
@@ -23,7 +23,7 @@ namespace Lyt.World.Model
         public override void Reset()
         {
             this.firstCall = true;
-            this.Input = this.Model.EquationFromName(this.inputEquationName);
+            this.Input = this.Simulator.EquationFromName(this.inputEquationName);
             this.alpha = new Stage();
             this.beta = new Stage();
             this.gamma = new Stage();
@@ -50,7 +50,7 @@ namespace Lyt.World.Model
             }
             else
             {
-                double dt = this.Model.DeltaTime;
+                double dt = this.Simulator.DeltaTime;
                 this.alpha.K = this.alpha.J + dt * (this.Input.J - this.alpha.J) / this.delayPerStage;
                 this.beta.K = this.beta.J + dt * (this.alpha.J - this.beta.J) / this.delayPerStage;
                 this.gamma.K = this.gamma.J + dt * (this.beta.J - this.gamma.J) / this.delayPerStage;

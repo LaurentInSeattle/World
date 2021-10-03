@@ -1,9 +1,11 @@
 ﻿namespace Lyt.World.Model
 {
+    using Lyt.World.Engine;
+
     using System;
 
     // Model Variables: Creates the Agricultural Sector - Equations #84 to 128
-    public sealed partial class Model
+    public sealed partial class WorldModel
     {
         private Level arableLand;
         private Level potentiallyArableLand;
@@ -117,7 +119,7 @@
                 // Bug ??? Both 'After' and 'Before' tables below are identical 
                 UpdateFunction = delegate ()
                 {
-                    return Clip(indicatedFoodPerCapitaAfter.K, indicatedFoodPerCapitaBefore.K, this.Time, Model.PolicyYear);
+                    return Clip(indicatedFoodPerCapitaAfter.K, indicatedFoodPerCapitaBefore.K, this.Time, WorldModel.PolicyYear);
                 }
             };
 
@@ -152,7 +154,7 @@
                         return Clip(
                             fractionOfIndustrialOutputAllocatedToAgricultureAfter.K,
                             fractionOfIndustrialOutputAllocatedToAgricultureBefore.K,
-                            this.Time, Model.PolicyYear);
+                            this.Time, WorldModel.PolicyYear);
                     }
                 };
 
@@ -224,7 +226,7 @@
                     // Bug ??? Both 'After' and 'Before' values above are identical 
                     return Clip(
                         averageLifetimeOfAgriculturalInputsAfter, averageLifetimeOfAgriculturalInputsBefore,
-                        this.Time, Model.PolicyYear);
+                        this.Time, WorldModel.PolicyYear);
                 }
             };
 
@@ -264,7 +266,7 @@
                 UpdateFunction = delegate ()
                 {
                     // Bug ??? Both 'After' and 'Before' const values above are identical 
-                    return Clip( landYieldFactorAfter, landYieldFactorBefore, this.Time, Model.PolicyYear);
+                    return Clip( landYieldFactorAfter, landYieldFactorBefore, this.Time, WorldModel.PolicyYear);
                 }
             };
 
@@ -275,7 +277,7 @@
                     // Bug ??? Both 'After' and 'Before' tables below are identical 
                     return Clip(
                         landYieldMultiplierFromAirPollutionAfter.K, landYieldMultiplierFromAirPollutionBefore.K,
-                        this.Time, Model.PolicyYear);
+                        this.Time, WorldModel.PolicyYear);
                 }
             };
 
@@ -359,7 +361,7 @@
                 {
                     return
                         Clip(landLifeMultiplierFromYieldAfter.K, landLifeMultiplierFromYieldBefore.K,
-                        this.Time, Model.PolicyYear);
+                        this.Time, WorldModel.PolicyYear);
                 }
             };
 

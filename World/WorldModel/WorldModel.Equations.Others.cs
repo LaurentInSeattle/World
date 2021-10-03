@@ -1,7 +1,9 @@
 ﻿namespace Lyt.World.Model
 {
+    using Lyt.World.Engine;
+
     // Model Variables: Creates Other Sectors - Equations #129 to #149
-    public sealed partial class Model
+    public sealed partial class WorldModel
     {
         private Level nonrenewableResources;
         private Level persistentPollution;
@@ -73,7 +75,7 @@
                 //    return clip(this.after, this.before, t, policyYear);
                 //}
                 // Always one ??? Possibly a bug ? 
-                UpdateFunction = delegate () { return Clip(1.0, 1.0, this.Time, Model.PolicyYear); }
+                UpdateFunction = delegate () { return Clip(1.0, 1.0, this.Time, WorldModel.PolicyYear); }
             };
 
             this.perCapitaResourceUsageMultiplier =
@@ -96,7 +98,7 @@
                         return Clip(
                             fractionOfCapitalAllocatedToObtainingResourcesAfter.K,
                             fractionOfCapitalAllocatedToObtainingResourcesBefore.K,
-                            this.Time, Model.PolicyYear);
+                            this.Time, WorldModel.PolicyYear);
                     }
                 };
 
@@ -141,7 +143,7 @@
                 //persistentPollutionGenerationFactor.updateFn = function() {
                 //    return clip(this.after, this.before, t, policyYear); }
                 // Always one ??? Possibly a bug ? 
-                UpdateFunction = delegate () { return Clip(1.0, 1.0, this.Time, Model.PolicyYear); }
+                UpdateFunction = delegate () { return Clip(1.0, 1.0, this.Time, WorldModel.PolicyYear); }
             };
 
             const double persistentPollutionGeneratedByIndustrialOutputFractionOfResourcesAsPersistentMaterial = 0.02;  // dimensionless

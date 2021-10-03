@@ -1,4 +1,4 @@
-﻿namespace Lyt.World.Model
+﻿namespace Lyt.World.Engine
 {
     using Lyt.CoreMvvm.Extensions;
 
@@ -11,14 +11,14 @@
 
         private bool logData;
 
-        public Equation(Model model, string name, int number, string units) : base(model, name, number, units)
+        public Equation(Simulator model, string name, int number, string units) : base(model, name, number, units)
         {
-            this.Model.OnNewEquation(this);
+            this.Simulator.OnNewEquation(this);
         }
 
-        public Equation(Model model, string name, int number) : base(model, name, number, "dimensionless")
+        public Equation(Simulator model, string name, int number) : base(model, name, number, "dimensionless")
         {
-            this.Model.OnNewEquation(this);
+            this.Simulator.OnNewEquation(this);
         }
 
         public UpdateDelegate UpdateFunction { get; set; }

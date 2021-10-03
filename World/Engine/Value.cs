@@ -1,4 +1,4 @@
-﻿namespace Lyt.World.Model
+﻿namespace Lyt.World.Engine
 {
     using Lyt.CoreMvvm.Extensions;
 
@@ -7,7 +7,7 @@
 
     public class Value
     {
-        public readonly Model Model;
+        public readonly Simulator Simulator;
 
         public readonly string Name;
 
@@ -17,9 +17,9 @@
 
         private double k;
 
-        public Value(Model model, string name, int number, string units)
+        public Value(Simulator model, string name, int number, string units)
         {
-            this.Model = model;
+            this.Simulator = model;
             this.Name = name;
             this.Number = number;
             this.Units = units;
@@ -70,7 +70,7 @@
         [Conditional("DEBUG")]
         public void CheckForNaNAndInfinity(string equationName )
         {
-            var equation = this.Model.EquationFromName(equationName);
+            var equation = this.Simulator.EquationFromName(equationName);
             if (double.IsNaN(k) || double.IsInfinity(k))
             {
                 Debug.WriteLine(equation.FriendlyName + " is 'NaN' or infinite. ~ " + equation.Name);
@@ -91,8 +91,8 @@
         [Conditional("DEBUG")]
         public void CheckForNegative(string equationName)
         {
-            var equation = this.Model.EquationFromName(equationName);
-            if ((equation.K < 0.0) && (this.Model.TickCount > 1))
+            var equation = this.Simulator.EquationFromName(equationName);
+            if ((equation.K < 0.0) && (this.Simulator.TickCount > 1))
             {
                 Debug.WriteLine(equation.FriendlyName + " is negative. ~ " + equation.Name);
                 if (Debugger.IsAttached) { Debugger.Break(); }
@@ -102,7 +102,7 @@
         [Conditional("DEBUG")]
         public void CheckForNegative()
         {
-            if ((this.k < 0.0) && (this.Model.TickCount > 1))
+            if ((this.k < 0.0) && (this.Simulator.TickCount > 1))
             {
                 Debug.WriteLine(this.FriendlyName + " is negative. ~ " + this.Name);
                 if (Debugger.IsAttached) { Debugger.Break(); }
@@ -112,7 +112,7 @@
         [Conditional("DEBUG")]
         public void CheckForNegative(double value)
         {
-            if ((value < 0.0) && ( this.Model.TickCount > 1 ))
+            if ((value < 0.0) && ( this.Simulator.TickCount > 1 ))
             {
                 Debug.WriteLine("Value is negative. ");
                 if (Debugger.IsAttached) { Debugger.Break(); }
@@ -129,7 +129,7 @@
         public void CheckForZero(double value)
         {
             const double epsilon = 0.000_000_000_1; 
-            if ((Math.Abs(value) < epsilon) && (this.Model.TickCount > 1))
+            if ((Math.Abs(value) < epsilon) && (this.Simulator.TickCount > 1))
             {
                 Debug.WriteLine("Value is zero. ");
                 if (Debugger.IsAttached) { Debugger.Break(); }

@@ -1,4 +1,4 @@
-﻿namespace Lyt.World.Model
+﻿namespace Lyt.World.Engine
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@
         public readonly List<double> Indices;
 
         public Table(
-            Model model, string name, int number, string units, double[] data, double min, double max, double delta)
+            Simulator model, string name, int number, string units, double[] data, double min, double max, double delta)
             : base(model, name, number, units)
         {
             this.Data = data;
