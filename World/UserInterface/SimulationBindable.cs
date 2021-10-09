@@ -182,7 +182,7 @@ namespace Lyt.World.UserInterface
             }
             else
             {
-                if ( ((int) this.model.Time) % 20 == 0)
+                if (((int)this.model.Time) % 17 == 0)
                 {
                     this.UpdatePlots();
                 }
