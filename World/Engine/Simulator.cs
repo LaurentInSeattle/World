@@ -10,11 +10,10 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class Simulator
+    public abstract class Simulator
     {
-        public const int StartYear = 1900;
-        public const int PolicyYear = 1975; // eqn 150.1
-
+        public static Simulator Instance; 
+            
         protected readonly List<Equation> EquationsList;
         protected readonly List<Level> Levels;
         protected readonly List<Rate> Rates;
@@ -36,6 +35,14 @@
             this.Auxiliaries = new Dictionary<string, Auxiliary>(128);
             this.OrderedAuxiliaries = new List<Auxiliary>(128);
         }
+
+        public abstract void Parametrize ();
+
+        public abstract bool SimulationEnded();
+
+        public abstract List<PlotDefinition> Plots();
+
+        public virtual double InitialTime() => 0.0;
 
         protected void FinalizeConstruction (IEnumerable<string> auxSequence, Action customUpdate)
         {
@@ -114,13 +121,13 @@
             return logs;
         }
 
-        protected void Start(double deltaTime)
+        public void Start(double deltaTime)
         {
             this.Reset();
             this.InitializeLevels();
             this.InitializeSmoothAndDelays();
             this.TickCount = 0;
-            this.Time = StartYear;
+            this.Time = this.InitialTime();
 
             for (int i = 1; i <= 3; ++i)
             {
@@ -133,7 +140,7 @@
             this.InitializeLevels();
             this.TickCount = 0;
             this.DeltaTime = deltaTime; 
-            this.Time = StartYear;
+            this.Time = this.InitialTime();
         }
 
         protected static double Clip(double a, double b, double x, double y) => x >= y ? a : b;

@@ -94,12 +94,16 @@
 
     public sealed partial class WorldModel : Simulator
     {
+        public const int StartYear = 1900;
+        public const int PolicyYear = 1975; // eqn 150.1
+
+
         private Parameter[] parameters = new Parameter[]
         {
             new Parameter("Simulation Duration", 220, 180, 420, 20, Widget.Slider, null, Format.Integer),
             new Parameter("Delta Time", 1.0, 0.2, 1.0, 0.1),
             new Parameter("Resources Multiplier", 1.0, 0.5, 2.5, 0.1),
-            new Parameter("Output Consumed", 0.43, 0.37, 0.47, 0.01),
+            new Parameter("Output Consumed", 0.43, 0.31, 0.53, 0.02),
         };
 
         public WorldModel() : base()
@@ -114,12 +118,66 @@
             base.FinalizeConstruction(this.auxSequence, this.CustomUpdate);
         }
 
-        public void Start() => base.Start(this.Parameters.Get("Delta Time"));
+        public override double InitialTime() => WorldModel.StartYear; 
 
-        public void Parametrize()
+        public override bool SimulationEnded()
+        {
+            var durationYears = this.Parameters.FromName("Simulation Duration");
+            return (this.Time > this.InitialTime() + (int)durationYears.CurrentValue);
+        }
+
+        public override void Parametrize()
         {
             this.SetInitialResources(this.Parameters.Get("Resources Multiplier"));
             this.SetOutputConsumed(this.Parameters.Get("Output Consumed"));
+        }
+
+
+        public override List<PlotDefinition> Plots ()
+        {
+            return new List<PlotDefinition>
+            {
+                new PlotDefinition("Population", PlotKind.Absolute, new List<string>
+                    {
+                        "population",
+                        "population0To14",
+                        "population0To44",
+                        "population0To64",
+                    }),
+                new PlotDefinition("Industry", PlotKind.Absolute, new List<string>
+                    {
+                        "industrialOutput",
+                    }),
+                new PlotDefinition("Services", PlotKind.Absolute, new List<string>
+                    {
+                        "serviceOutput",
+                    }),
+                new PlotDefinition("Agriculture", PlotKind.Absolute, new List<string>
+                    {
+                        "food",
+                    }),
+                new PlotDefinition("Resources", PlotKind.Absolute, new List<string>
+                    {
+                        "nonrenewableResources",
+                    }),
+                new PlotDefinition("Pollution", PlotKind.Absolute, new List<string>
+                    {
+                        "persistentPollution",
+                    }),
+                new PlotDefinition("Arable Land", PlotKind.Absolute, new List<string>
+                    {
+                        "arableLand",
+                    }),
+                new PlotDefinition("Life Expectancy", PlotKind.Absolute, new List<string>
+                    {
+                        "lifeExpectancy",
+                    }),
+
+                new PlotDefinition("Food Per Capita", PlotKind.Absolute, new List<string>
+                    {
+                        "foodPerCapita",
+                    }),
+            };
         }
 
         private void CustomUpdate() => this.persistenPollutionAppearanceRate.Update();

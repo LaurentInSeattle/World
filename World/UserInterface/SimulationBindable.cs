@@ -3,6 +3,7 @@
 namespace Lyt.World.UserInterface
 {
     using Lyt.CoreMvvm;
+    using Lyt.World.Engine;
     using Lyt.World.Model;
     using Lyt.World.UserInterface.Controls;
 
@@ -20,17 +21,19 @@ namespace Lyt.World.UserInterface
     {
         #region VERBOSE and DEBUG variables 
 
+        // Those lists should go in the model classes 
+
         private List<string> debugVariables = new List<string>
         {
             //"industrialCapital", 
             //"industrialOutput", 
             //"lifeExpectancy",
-            "food",
+            // "food",
         };
 
         private List<string> trackedVariables = new List<string>
         {
-            "lifeExpectancy",
+            // "lifeExpectancy",
         };
 
         #endregion VERBOSE and DEBUG variables 
@@ -40,14 +43,19 @@ namespace Lyt.World.UserInterface
         private bool stopRequested;
         private bool isRunning;
         private bool runFast;
-        private WorldModel model;
+
+        private Simulator model;
 
 
         public void OnLoad()
         {
-            this.model = new WorldModel();
             this.StopCommand = new Command(this.OnStop);
             this.RunCommand = new Command(this.OnRun);
+
+            // TODO: Provide some UI to pick the model we want to run 
+            // 
+            // this.model = new WorldModel();
+            this.model = new FluModel();
             this.CreatePlots();
             this.OnReset();
         }
@@ -55,85 +63,33 @@ namespace Lyt.World.UserInterface
         private void CreatePlots()
         {
             var gridContent = this.View.PlotsGrid.Children;
-
+            this.Plots = new List<Plot>();
             void PlaceAt(WpfPlot wpfPlot, int row, int col)
             {
                 Grid.SetRow(wpfPlot, row);
                 Grid.SetColumn(wpfPlot, col);
                 gridContent.Add(wpfPlot);
+                this.Plots.Add(new Plot(wpfPlot)); 
             }
 
-            var plotTopLeft = new WpfPlot();
-            PlaceAt(plotTopLeft, 0, 0);
+            // TODO: For sure, improve layout 
+            PlaceAt(new WpfPlot(), 0, 0);
+            PlaceAt(new WpfPlot(), 0, 1);
+            PlaceAt(new WpfPlot(), 0, 2);
+            PlaceAt(new WpfPlot(), 1, 0);
+            PlaceAt(new WpfPlot(), 1, 1);
+            PlaceAt(new WpfPlot(), 1, 2);
+            PlaceAt(new WpfPlot(), 2, 0);
+            PlaceAt(new WpfPlot(), 2, 1);
+            PlaceAt(new WpfPlot(), 2, 2);
 
-            var plotTopMiddle = new WpfPlot();
-            PlaceAt(plotTopMiddle, 0, 1);
-
-            var plotTopRight = new WpfPlot();
-            PlaceAt(plotTopRight, 0, 2);
-
-            var plotMidLeft = new WpfPlot();
-            PlaceAt(plotMidLeft, 1, 0);
-
-            var plotMidMiddle = new WpfPlot();
-            PlaceAt(plotMidMiddle, 1, 1);
-
-            var plotMidRight = new WpfPlot();
-            PlaceAt(plotMidRight, 1, 2);
-
-            var plotBotLeft = new WpfPlot();
-            PlaceAt(plotBotLeft, 2, 0);
-
-            var plotBotMiddle = new WpfPlot();
-            PlaceAt(plotBotMiddle, 2, 1);
-
-
-            var plotBotRight = new WpfPlot();
-            PlaceAt(plotBotRight, 2, 2);
-            this.Plots = new List<Plot>
+            int index = 0; 
+            var plotDefinitions = this.model.Plots();
+            foreach( var plotDefinition in plotDefinitions)
             {
-                new Plot(plotTopLeft, "Population", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "population",
-                        "population0To14",
-                        "population0To44",
-                        "population0To64",
-                    }),
-                new Plot(plotTopMiddle, "Industry", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "industrialOutput",
-                    }),
-                new Plot(plotMidMiddle, "Services", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "serviceOutput",
-                    }),
-                new Plot(plotBotMiddle, "Agriculture", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "food",
-                    }),
-                new Plot(plotTopRight, "Resources", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "nonrenewableResources",
-                    }),
-                new Plot(plotMidRight, "Pollution", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "persistentPollution",
-                    }),
-                new Plot(plotBotRight, "Arable Land", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "arableLand",
-                    }),
-                new Plot(plotMidLeft, "Life Expectancy", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "lifeExpectancy",
-                    }),
-
-                new Plot(plotBotLeft, "Food Per Capita", Plot.PlotKind.Absolute, new List<string>
-                    {
-                        "foodPerCapita",
-                    }),
-            };
-
+                this.Plots[index].SetDefinition ( plotDefinition) ;
+                ++index;
+            }
         }
 
         private void OnReset()
@@ -146,12 +102,20 @@ namespace Lyt.World.UserInterface
 
             this.LogText = string.Empty;
             this.TrackText = string.Empty;
-            this.model.Start();
+            this.model.Start(this.model.Parameters.Get("Delta Time"));
             var joined = new List<string>();
             foreach (var plot in this.Plots)
             {
-                joined.AddRange(plot.Equations);
-            }
+                if ((plot == null) || !plot.IsValid)
+                {
+                    continue; 
+                }
+
+                if (plot.Equations != null)
+                {
+                    joined.AddRange(plot.Equations);
+                }
+            } 
 
             joined.AddRange(this.trackedVariables);
             this.model.Log(joined);
@@ -234,8 +198,7 @@ namespace Lyt.World.UserInterface
         private void TimerTick(object sender, EventArgs e)
         {
             this.OnTick();
-            var durationYears = this.model.Parameters.FromName("Simulation Duration");
-            if (this.stopRequested || (this.model.Time > Model.WorldModel.StartYear + (int)durationYears.CurrentValue))
+            if (this.stopRequested || this.model.SimulationEnded())
             {
                 this.timer.Stop();
                 this.timer.Tick -= TimerTick;
@@ -286,27 +249,32 @@ namespace Lyt.World.UserInterface
 
         private void UpdatePlots()
         {
-            int length = (int)((this.model.Time - WorldModel.StartYear) / this.model.DeltaTime);
+            int length = (int)((this.model.Time - this.model.InitialTime()) / this.model.DeltaTime);
             double[] dataX = new double[length];
             for (int i = 0; i < length; ++i)
             {
-                dataX[i] = WorldModel.StartYear + i * this.model.DeltaTime;
+                dataX[i] = this.model.InitialTime() + i * this.model.DeltaTime;
             }
 
             int locationIndex = 0;
             foreach (var plot in this.Plots)
             {
+                if ( (plot == null) || !plot.IsValid) 
+                {
+                    break; 
+                }
+
                 this.UpdatePlot(plot.PlotHost, plot.Name, plot.Kind, plot.Equations, dataX);
                 ++locationIndex;
             }
         }
 
-        private void UpdatePlot(WpfPlot plot, string name, Plot.PlotKind kind, List<string> equations, double[] dataX)
+        private void UpdatePlot(WpfPlot plot, string name, PlotKind kind, List<string> equations, double[] dataX)
         {
             var pPlot = plot.Plot;
             pPlot.Clear();
             pPlot.XAxis2.Label(name);
-            int length = (int)((this.model.Time - WorldModel.StartYear) / this.model.DeltaTime);
+            int length = (int)((this.model.Time - this.model.InitialTime()) / this.model.DeltaTime);
             foreach (string equationName in equations)
             {
                 var equation = this.model.EquationFromName(equationName);
@@ -314,7 +282,7 @@ namespace Lyt.World.UserInterface
                 for (int i = 0; i < length; ++i)
                 {
                     double value;
-                    if (kind == Plot.PlotKind.Normalized)
+                    if (kind == PlotKind.Normalized)
                     {
                         value = equation.NormalizedLoggedValue(i);
                     }
@@ -357,27 +325,29 @@ namespace Lyt.World.UserInterface
 
         private class Plot
         {
-            public enum PlotKind
-            {
-                Absolute,
-                Normalized,
-            }
-
-            public Plot(WpfPlot plot, string name, PlotKind kind, List<string> equations)
+            public Plot(WpfPlot plot)
             {
                 this.PlotHost = plot;
-                this.Name = name;
-                this.Kind = kind;
-                this.Equations = equations;
             }
+
+            public void SetDefinition (PlotDefinition plotDefinition)
+            {
+                this.PlotDefinition = plotDefinition;
+                this.IsValid = true; 
+            }
+
+
+            public bool IsValid { get; private set; }
 
             public WpfPlot PlotHost { get; private set; }
 
-            public string Name { get; private set; }
+            private PlotDefinition PlotDefinition { get; set; }
 
-            public PlotKind Kind { get; private set; }
+            public string Name => this.PlotDefinition.Name;
 
-            public List<string> Equations { get; private set; }
+            public PlotKind Kind => this.PlotDefinition.Kind;
+
+            public List<string> Equations => this.PlotDefinition.Equations;
         }
     }
 }

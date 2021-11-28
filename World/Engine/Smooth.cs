@@ -20,6 +20,15 @@
             this.initialValue = initialValue; 
         }
 
+        public Smooth(string name, string units, double delay, string inputEquationName, double initialValue)
+            : base(Simulator.Instance, name, 0, units)
+        {
+            this.firstCall = true;
+            this.inputEquationName = inputEquationName;
+            this.delay = delay;
+            this.initialValue = initialValue;
+        }
+
         public InitializeDelegate InitializeFunction { get; set; }
 
         public override void Reset()

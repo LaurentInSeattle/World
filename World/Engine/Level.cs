@@ -16,6 +16,12 @@
             model.OnNewLevel(this);
         }
 
+        public Level(string name, string units, double initialValue) : base(Simulator.Instance, name, 0, units)
+        {
+            this.initialValue = initialValue;
+            Simulator.Instance.OnNewLevel(this);
+        }
+
         public void ReInitialize(double initialValue)
         {
             this.initialValue = initialValue;

@@ -21,6 +21,16 @@
             this.Simulator.OnNewEquation(this);
         }
 
+        public Equation(string name, int number, string units) : base(Simulator.Instance, name, 0, units)
+        {
+            Simulator.Instance.OnNewEquation(this);
+        }
+
+        public Equation(string name, int number) : base(Simulator.Instance, name, 0, "dimensionless")
+        {
+            Simulator.Instance.OnNewEquation(this);
+        }
+
         public UpdateDelegate UpdateFunction { get; set; }
 
         public double J { get; set; }

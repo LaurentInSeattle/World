@@ -20,6 +20,14 @@
             this.inputEquationName = inputEquationName;
         }
 
+        public Delay(string name, string units, double delay, string inputEquationName)
+            : base(Simulator.Instance, name, 0, units)
+        {
+            this.firstCall = true;
+            this.delayPerStage = delay / 3.0;
+            this.inputEquationName = inputEquationName;
+        }
+
         public override void Reset()
         {
             this.firstCall = true;

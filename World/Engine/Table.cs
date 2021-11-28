@@ -27,6 +27,21 @@
             }
         }
 
+        public Table(
+            string name, string units, double[] data, double min, double max, double delta)
+            : base(Simulator.Instance, name, 0, units)
+        {
+            this.Data = data;
+            this.Min = min;
+            this.Max = max;
+            this.Delta = delta;
+            this.Indices = new List<double>();
+            for (double i = this.Min; i <= this.Max; i += this.Delta)
+            {
+                this.Indices.Add(i);
+            }
+        }
+
         public override void Update()
         {
             if (this.UpdateFunction != null)
