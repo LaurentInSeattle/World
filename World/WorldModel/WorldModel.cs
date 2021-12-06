@@ -118,7 +118,13 @@
             base.FinalizeConstruction(this.auxSequence, this.CustomUpdate);
         }
 
-        public override double InitialTime() => WorldModel.StartYear; 
+        public override string TimeUnit => "Year";
+
+        public override double InitialTime() => WorldModel.StartYear;
+
+        public override int PlotRows => 3;
+
+        public override int PlotCols => 3;
 
         public override bool SimulationEnded()
         {

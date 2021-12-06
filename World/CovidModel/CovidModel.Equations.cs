@@ -4,67 +4,23 @@
 
     using System;
 
-    public sealed partial class FluModel : Simulator
+    public sealed partial class CovidModel : Simulator
     {
-        #region Dynamo Model 
-        /*
-         *     SIMPLE EPIDEMIC MODEL
-            NOTE
-            L     SUSC.K=SUSC.J+DT*(-INF.JK)
-            N     SUSC=988
-            NOTE  SUSPECTIBLE POPULATION (PEOPLE)
-            R     INF.KL=SICK.K*CNTCTS.K*FRSICK
-            NOTE  INFECTION RATE (PEOPLE PER DAY)
-            C     FRSICK=0.05
-            NOTE  FRACTION OF CONTACTS BECOMING SICK
-            NOTE  (DIMENSIONLESS)
-            L     SICK.K=SICK.J+DT*(INF.JK-CURE.JK)
-            N     SICK=2
-            NOTE  SICK POPULATION (PEOPLE)
-            A     CNTCTS.K=TABLE(TABCON,SUSC.K/TOTAL,0,1,0.2)
-            NOTE  SUSPECTIBLE CONTACTED PER INFECTED PERSON
-            NOTE  PER DAY (PEOPLE PER PERSON PER DAY)
-            T     TABCON=0/2.8/5.5/8/9.5/10
-            NOTE  TABLE FOR CONTACTS
-            N     TOTAL=SUSC+SICK+RECOV
-            NOTE  TOTAL POPULATION (PEOPLE)
-            R     CURE.KL=SICK.K/DUR
-            NOTE  CURE RATE (PEOPLE PER DAY)
-            C     DUR=10
-            NOTE  DURATION OF DISEASE (DAYS)
-            L     RECOV.K=RECOV.J+DT*CURE.JK
-            N     RECOV=10
-            NOTE  RECOVERED POPULATION (PEOPLE)
-            NOTE
-            SPEC  DT=0.25,LENGTH=50,PRTPER=5,PLTPER=0.5
-            PRINT SUSC,SICK,RECOV,INF,CURE
-            PLOT  SUSC=W,SICK=S,RECOV=R(0,1000)/INF=I,CURE=C(0,200)
-            RUN   SIMPLE
-            NOTE
-            NOTE  **** MODIFIED MODEL WITH DELAY (INCUBATION)
-            NOTE
-            EDIT  SIMPLE
-            NOTE  INCUBATION DELAY (DAYS)
-            C     TSS=3
-            NOTE  FRACTION OF CONTACTS SHOWING SYMPTOMS
-            NOTE  (DIMENSIONLESS)
-            R     SYMP.KL=DELAY1(INF.JK,TSS)
-            L     SICK.K=SICK.J+DT*(SYMP.JK-CURE.JK)
-            RUN   DELAY
-         */
-        #endregion Dynamo Model 
-
         private Auxiliary population;
 
         private Auxiliary recoveryPerDay;
         private Auxiliary deathPerDay;
 
-        private Level susceptible;
-
-        private Level infected;     // incubating
+        private Level susceptible;  // initial pop'
+        private Level infected;     // incubating, non contagious
+        private Level contagious;   // incubating, contagious, full mobility
+        private Level asymptomatic; // contagious, full mobility
+        private Level mild;         // reduced mobility
         private Level sick;         // home isolated 
-        private Level recovered;
-        private Level dead;
+        private Level serious;      // hospital isolated 
+        private Level critical;     // icu isolated 
+        private Level recovered;    // immune for a while
+        private Level dead;         // the end
 
         private Rate infectedPerDay;
         private PureDelay sickPerDay;
@@ -72,18 +28,34 @@
         private PureDelay vulnerablePerDay;
 
         // TODO: Make these values simulation parameters 
-        private readonly double contacts = 8; // people
-        private readonly double rawInfectionRate = 0.035; // dimensionless 
+        private readonly double hospitalBedsRatio = 0.001_5;   // beds per person   (10,244 in WA for 7.6 M pop ) 
+        private readonly double icuBedsRatio = 0.000_15;       // beds per person   (1,233 in WA)
 
-        private readonly double incubationDays = 12; // days
+        private readonly double contactsFullMobility = 8; // people
+        private readonly double contactsReducedMobility = 3; // people
+
+        private readonly double incubationDays = 3; // days
+        private readonly double contagiousDays = 7; // days
+        private readonly double asymptomaticDays = 10; // days
         private readonly double sicknessDays = 14; // days
+        private readonly double seriousDays = 21; // days
+        private readonly double criticalDays = 28; // days
+
+        private readonly double asymptomaticRatio = 0.40; // contagious, full mobility
+        private readonly double mildRatio = 0.35;         // reduced mobility
+        private readonly double sickRatio = 0.15;         // home isolated 
+        private readonly double seriousRatio = 0.08;      // hospital isolated 
+        private readonly double criticalRatio = 0.02;     // icu isolated 
+
+        private readonly double rawInfectionRate = 0.035; // dimensionless 
         private readonly double rawLethalityRate = 0.025; // dimensionless 
+
         private readonly double lostImmunityDays =  3 * 30; // dimensionless 
 
         private void CreateModel()
         {
 
-            this.sector = "Flu Model";
+            this.sector = "Covid Model";
             this.subSector = "";
 
             this.population = new Auxiliary("population", "persons")
@@ -119,7 +91,7 @@
                 CannotBeNegative = true,
                 UpdateFunction = delegate ()
                 {
-                    double infectedContacts = this.rawInfectionRate * this.contacts * this.infected.K; 
+                    double infectedContacts = this.rawInfectionRate * this.contactsFullMobility * this.infected.K; 
                     double value = 0.0; 
                     if ( infectedContacts < this.susceptible.K )
                     {
@@ -133,14 +105,6 @@
                     return AsInt(Positive(value));
                 }
             };
-
-            //this.contacts =
-            //    new Table("contacts", "Persons per person and per day",
-            //    new double[] { 0.0, 2.8, 5.5, 8, 9.5, 10 }, 0, 10, 0.5)
-            //    {
-            //        UpdateFunction = delegate () { return susceptible.K / this.population.K; }
-            //    };
-
 
             this.sick = new Level("sick", "persons", 0.0)
             {

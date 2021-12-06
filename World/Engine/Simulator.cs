@@ -25,7 +25,9 @@
         protected string sector;
         protected string subSector;
 
-        private Action customUpdate; 
+        private Action customUpdate;
+
+        private Action customStart;
 
         public Simulator()
         {
@@ -44,9 +46,17 @@
 
         public virtual double InitialTime() => 0.0;
 
-        protected void FinalizeConstruction (IEnumerable<string> auxSequence, Action customUpdate)
+        public virtual string TimeUnit => string.Empty;
+
+        public virtual int PlotRows => 1;
+
+        public virtual int PlotCols => 1;
+
+
+        protected void FinalizeConstruction (IEnumerable<string> auxSequence, Action customUpdate = null, Action customStart = null)
         {
-            this.customUpdate = customUpdate; 
+            this.customUpdate = customUpdate;
+            this.customStart = customStart;
             this.SortAuxiliaryEquations(auxSequence);
             this.EquationsDictionary = this.EquationsList.Where(equ => equ != null).ToDictionary(equ => equ.Name, equ => equ);
             this.Reset();
@@ -123,6 +133,7 @@
 
         public void Start(double deltaTime)
         {
+            this.DeltaTime = deltaTime;
             this.Reset();
             this.InitializeLevels();
             this.InitializeSmoothAndDelays();
@@ -139,11 +150,15 @@
 
             this.InitializeLevels();
             this.TickCount = 0;
-            this.DeltaTime = deltaTime; 
             this.Time = this.InitialTime();
+            this.customStart?.Invoke();
         }
 
         protected static double Clip(double a, double b, double x, double y) => x >= y ? a : b;
+
+        protected static double Positive (double x) => x < 0.0 ? 0.0 : x;
+
+        protected static double AsInt(double x) => Math.Round(x, MidpointRounding.AwayFromZero);
 
         protected void CheckForNaNsAndInfinities()
             => this.EquationsDictionary.Values.ForEach<Equation>((e) => e.CheckForNaNAndInfinity());
@@ -171,6 +186,11 @@
             this.EquationsList.ForEach<Equation>(
                 (equation) =>
                 {
+                    if (equation is PureDelay pureDelay)
+                    {
+                        pureDelay.Initialize();
+                    }
+
                     if (equation is Smooth smooth)
                     {
                         smooth.Initialize();

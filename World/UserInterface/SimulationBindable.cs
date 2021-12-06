@@ -1,4 +1,4 @@
-﻿// #define VERBOSE
+﻿//#define VERBOSE
 
 namespace Lyt.World.UserInterface
 {
@@ -25,15 +25,28 @@ namespace Lyt.World.UserInterface
 
         private List<string> debugVariables = new List<string>
         {
-            //"industrialCapital", 
-            //"industrialOutput", 
-            //"lifeExpectancy",
-            // "food",
+            "infectedPerDay",
+            "sickPerDay",
+            "recoveryPerDay",
+            "deathPerDay",
+            "outcome",
+
+            // Levels 
+            "susceptible",
+            "infected",
+            "sick",
+            "recovered",
+            "dead",
         };
 
         private List<string> trackedVariables = new List<string>
         {
-            // "lifeExpectancy",
+            // Levels 
+            "susceptible",
+            "infected",
+            "sick",
+            "recovered",
+            "dead",
         };
 
         #endregion VERBOSE and DEBUG variables 
@@ -50,6 +63,7 @@ namespace Lyt.World.UserInterface
         public void OnLoad()
         {
             this.StopCommand = new Command(this.OnStop);
+            this.StepCommand = new Command(this.OnStep);
             this.RunCommand = new Command(this.OnRun);
 
             // TODO: Provide some UI to pick the model we want to run 
@@ -62,7 +76,20 @@ namespace Lyt.World.UserInterface
 
         private void CreatePlots()
         {
-            var gridContent = this.View.PlotsGrid.Children;
+            var plotRows = this.model.PlotRows;
+            var plotCols = this.model.PlotCols;
+            var grid = this.View.PlotsGrid;
+            for (int row = 0; row < plotRows; ++row)
+            {
+                grid.RowDefinitions.Add(new RowDefinition());
+            }
+
+            for (int col = 0; col < plotCols; ++col)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+
+            var gridContent = grid.Children;
             this.Plots = new List<Plot>();
             void PlaceAt(WpfPlot wpfPlot, int row, int col)
             {
@@ -72,16 +99,13 @@ namespace Lyt.World.UserInterface
                 this.Plots.Add(new Plot(wpfPlot)); 
             }
 
-            // TODO: For sure, improve layout 
-            PlaceAt(new WpfPlot(), 0, 0);
-            PlaceAt(new WpfPlot(), 0, 1);
-            PlaceAt(new WpfPlot(), 0, 2);
-            PlaceAt(new WpfPlot(), 1, 0);
-            PlaceAt(new WpfPlot(), 1, 1);
-            PlaceAt(new WpfPlot(), 1, 2);
-            PlaceAt(new WpfPlot(), 2, 0);
-            PlaceAt(new WpfPlot(), 2, 1);
-            PlaceAt(new WpfPlot(), 2, 2);
+            for(int row = 0; row < plotRows; ++ row )
+            {
+                for (int col = 0; col < plotCols; ++col)
+                {
+                    PlaceAt(new WpfPlot(), row, col);
+                }
+            }
 
             int index = 0; 
             var plotDefinitions = this.model.Plots();
@@ -121,7 +145,7 @@ namespace Lyt.World.UserInterface
             this.model.Log(joined);
 
 #if VERBOSE 
-            this.DebugRowHeight = new GridLength(104, GridUnitType.Pixel);
+            this.DebugRowHeight = new GridLength(300, GridUnitType.Pixel);
 #else
             this.DebugRowHeight = new GridLength(0, GridUnitType.Pixel);
 #endif
@@ -188,6 +212,12 @@ namespace Lyt.World.UserInterface
             this.timer.Tick += TimerTick;
             this.timer.Start();
             this.isRunning = true;
+        }
+
+        private void OnStep(object _)
+        {
+            this.OnTick();
+            this.UpdatePlots();
         }
 
         private void OnStop(object _)
@@ -299,7 +329,10 @@ namespace Lyt.World.UserInterface
         }
 
         private void UpdateYear()
-            => this.YearText = this.isRunning ? string.Format("Year: {0} ", (int)this.model.Time) : string.Empty;
+            => this.YearText = 
+                this.isRunning ? 
+                    string.Format("{0}: {1} ", this.model.TimeUnit, (int)this.model.Time) : 
+                    string.Empty;
 
         #region Bound Properties
 
@@ -320,6 +353,9 @@ namespace Lyt.World.UserInterface
 
         /// <summary> Gets or sets the RunCommand property.</summary>
         public ICommand RunCommand { get => this.Get<ICommand>(); set => this.Set(value); }
+
+        /// <summary> Gets or sets the StepCommand property.</summary>
+        public ICommand StepCommand { get => this.Get<ICommand>(); set => this.Set(value); }
 
         #endregion Bound Properties
 

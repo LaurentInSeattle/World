@@ -35,17 +35,6 @@
             x:Name="plotsGrid"
             Grid.Row="1" Grid.ColumnSpan="2"
             >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
         </Grid>
 
         <Grid
@@ -72,6 +61,13 @@
                 HorizontalAlignment="Left"
                 Content="Stop"
                 Command="{Binding StopCommand}"
+                />
+            <Button
+                Grid.Row="1" Margin="360 8 8 8"
+                Width="140"
+                HorizontalAlignment="Left"
+                Content="Tick"
+                Command="{Binding StepCommand}"
                 />
             <TextBlock
                 x:Name="year"
